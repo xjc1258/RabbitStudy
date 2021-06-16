@@ -7,6 +7,8 @@ import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +18,7 @@ public class RabbitMqConfig {
     /**
      * 消息交换机的名字
      */
-    public static final String EXCHANGE = "exchangeTest";
+    public static final String EXCHANGE = "xuejctest";
     /**
      * 队列key1
      */
@@ -25,6 +27,10 @@ public class RabbitMqConfig {
      * 队列key2
      */
     public static final String ROUTINGKEY2 = "queue_one_key2";
+    /**
+     * 队列key3
+     */
+    public static final String ROUTINGKEY3 = "queue_one_key3";
 
     @Autowired
     private QueueConfig queueConfig;
@@ -52,6 +58,13 @@ public class RabbitMqConfig {
     public Binding binding_two() {
         return BindingBuilder.bind(queueConfig.secondQueue()).to(exchangeConfig.directExchange()).with(RabbitMqConfig.ROUTINGKEY2);
     }
+    /**
+     * 将消息队列3和交换机进行绑定，并指定key
+     */
+    @Bean
+    public Binding binding_Third() {
+        return BindingBuilder.bind(queueConfig.thirdQueue()).to(exchangeConfig.directExchange()).with(RabbitMqConfig.ROUTINGKEY3);
+    }
 
     /**
      * queue listener  观察 监听模式
@@ -78,6 +91,8 @@ public class RabbitMqConfig {
     @Bean
     public RabbitTemplate rabbitTemplate() {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
+        template.setMessageConverter(messageConverter());
+
         /**若使用confirm-callback或return-callback，
          * 必须要配置publisherConfirms或publisherReturns为true
          * 每个rabbitTemplate只能有一个confirm-callback和return-callback
@@ -105,6 +120,11 @@ public class RabbitMqConfig {
     @Bean
     public MsgSendConfirmCallBack msgSendConfirmCallBack() {
         return new MsgSendConfirmCallBack();
+    }
+
+    @Bean
+    public MessageConverter messageConverter() {
+        return new Jackson2JsonMessageConverter();
     }
 }
 

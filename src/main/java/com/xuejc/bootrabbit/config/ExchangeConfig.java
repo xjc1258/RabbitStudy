@@ -3,7 +3,6 @@ package com.xuejc.bootrabbit.config;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 @Configuration
 public class ExchangeConfig {
 
@@ -20,6 +19,7 @@ public class ExchangeConfig {
     @Bean
     public DirectExchange directExchange() {
         DirectExchange directExchange = new DirectExchange(RabbitMqConfig.EXCHANGE, true, false);
+        System.out.println("定义了交换机exchangeTest");
         return directExchange;
     }
 
